@@ -1,6 +1,5 @@
-from hmac import compare_digest
 import websocket, json
-from helpers import place_ask_order, place_bid_order, cancel_ask_order, cancel_bid_order
+from helpers import place_order, cancel_all_orders
 
 TRADING_PAIR = "BTCUSDT"
 TIME_INTERVAL = "1s" 
