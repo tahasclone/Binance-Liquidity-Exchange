@@ -15,25 +15,33 @@ HEADERS = {
         "X-MBX-APIKEY": API_KEY
     }
 
+def create_signature(data):
+    signature = hmac.new(bytes(API_SECRET, 'UTF-8') , urlencode(data).encode(), hashlib.sha256).hexdigest()
+    return signature
 
 def place_order(symbol, price, side):
     URL = API_URL + "order"
 
     DATA = {
         "symbol": symbol,
-        "type": "STOP_LOSS" if side=="SELL" else "TAKE_PROFIT",
+        "type": "LIMIT_MAKER", #STOP_LOSS & STOP_LOSS_LIMIT orders not allowed for chosen trading pair
         "side": side,
-        "stopPrice": price,
-        "quantity": 1,
+        "price": price,
+        "quantity": 0.001,
         "timestamp": round(time.time() * 1000)
     }
     
-    signature = hmac.new(bytes(API_SECRET, 'UTF-8') , urlencode(DATA).encode(), hashlib.sha256).hexdigest()
+    signature = create_signature(DATA)
     DATA["signature"] = signature
     
-    response = requests.post(url = URL, headers=HEADERS, data = DATA)
+    try:
+        response = requests.post(url = URL, headers=HEADERS, data = DATA)
     
-    return response
+    except requests.exceptions as e:
+        print(e.response.text)
+    
+    if response.status_code == 200:
+        print("** ", side, " Order placed at ", str(price), " **")
 
 def cancel_all_orders(symbol):
     URL = API_URL + "openOrders"
@@ -42,14 +50,13 @@ def cancel_all_orders(symbol):
         "timestamp": round(time.time() * 1000)
     }
     
-    signature = hmac.new(bytes(API_SECRET, 'UTF-8') , urlencode(DATA).encode(), hashlib.sha256).hexdigest()
+    signature = create_signature(DATA)
     DATA["signature"] = signature
     
-    response = requests.delete(url = URL, headers=HEADERS, data = DATA)
-    
-    return response
-
-
-if __name__ == "__main__":
-    response = place_order("BTCUSDT", 19700.0, "BUY")
-    print(response.text)
+    try:
+        response = requests.delete(url = URL, headers=HEADERS, data = DATA)
+    except requests.exceptions as e:
+        print(e.response.text)
+        
+    if response.status_code == 200:
+        print("** Existing orders cancelled **")
