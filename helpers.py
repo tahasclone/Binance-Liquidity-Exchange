@@ -3,6 +3,7 @@ import requests
 import time
 import hmac
 from urllib.parse import urlencode
+import hashlib
 
 API_KEY = config.API_KEY
 API_SECRET = config.API_SECRET
@@ -13,6 +14,7 @@ HEADERS = {
         "Content-Type": "application/json",
         "X-MBX-APIKEY": API_KEY
     }
+
 
 def place_order(symbol, price, side):
     URL = API_URL + "order"
@@ -26,6 +28,9 @@ def place_order(symbol, price, side):
         "timestamp": round(time.time() * 1000)
     }
     
+    signature = hmac.new(bytes(API_SECRET, 'UTF-8') , urlencode(DATA).encode(), hashlib.sha256).hexdigest()
+    DATA["signature"] = signature
+    
     response = requests.post(url = URL, headers=HEADERS, data = DATA)
     
     return response
@@ -37,7 +42,7 @@ def cancel_all_orders(symbol):
         "timestamp": round(time.time() * 1000)
     }
     
-    signature = hmac.new(API_SECRET, urlencode(DATA))
+    signature = hmac.new(bytes(API_SECRET, 'UTF-8') , urlencode(DATA).encode(), hashlib.sha256).hexdigest()
     DATA["signature"] = signature
     
     response = requests.delete(url = URL, headers=HEADERS, data = DATA)
@@ -45,5 +50,6 @@ def cancel_all_orders(symbol):
     return response
 
 
-# if __name__ == "__main__":
-#     cancel_all_orders("btcusdt")
+if __name__ == "__main__":
+    response = place_order("BTCUSDT", 19700.0, "BUY")
+    print(response.text)
