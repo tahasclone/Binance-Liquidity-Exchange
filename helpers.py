@@ -8,10 +8,15 @@ API_KEY = config.API_KEY
 API_SECRET = config.API_SECRET
 
 API_URL = "https://testnet.binance.vision/api/v3/"
-auth = requests.HTTPBasicAuth(API_KEY, API_SECRET)
+
+HEADERS = {
+        "Content-Type": "application/json",
+        "X-MBX-APIKEY": API_KEY
+    }
 
 def place_order(symbol, price, side):
     URL = API_URL + "order"
+
     DATA = {
         "symbol": symbol,
         "type": "STOP_LOSS" if side=="SELL" else "TAKE_PROFIT",
@@ -21,10 +26,7 @@ def place_order(symbol, price, side):
         "timestamp": round(time.time() * 1000)
     }
     
-    signature = hmac.new(API_SECRET, urlencode(DATA))
-    DATA["signature"] = signature
-    
-    response = requests.post(url = URL, data = DATA, auth=auth)
+    response = requests.post(url = URL, headers=HEADERS, data = DATA)
     
     return response
 
@@ -35,6 +37,13 @@ def cancel_all_orders(symbol):
         "timestamp": round(time.time() * 1000)
     }
     
-    response = requests.delete(url = URL, data = DATA, auth=auth)
+    signature = hmac.new(API_SECRET, urlencode(DATA))
+    DATA["signature"] = signature
+    
+    response = requests.delete(url = URL, headers=HEADERS, data = DATA)
     
     return response
+
+
+# if __name__ == "__main__":
+#     cancel_all_orders("btcusdt")
