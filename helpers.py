@@ -1,10 +1,7 @@
-import config
-import requests
-import time
-import hmac
+import config, requests, time, hmac, hashlib, logging
 from urllib.parse import urlencode
-import hashlib
-import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 API_KEY = config.API_KEY
 API_SECRET = config.API_SECRET
@@ -40,7 +37,7 @@ def place_order(symbol, price, side):
         response.raise_for_status()
         
         if response.status_code == 200:
-            logging.debug(side, " Order placed at ", str(price))
+            logging.debug(str(side) + " Order placed at " + str(price))
             
             return response.json()
     
