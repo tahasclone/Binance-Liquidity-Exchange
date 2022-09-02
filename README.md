@@ -20,7 +20,7 @@ We do this by:
 ## Steps to run
 1. In order to place orders on the testnet, you require API access. You can generate HMAC_SHA256 Keys from: https://testnet.binance.vision/ by connecting with your github account.
 2. Install the project on your local machine.
-3. Create a python virtual environment and run " pip install  -r requirements.txt " to have all the required external packages for the project.
+3. Create a python virtual environment with version 3.6.9 and run " pip install  -r requirements.txt " to have all the required external packages for the project.
 4. Create a file called " config.py " and include the API_KEY and API_SECRET generated from the testnet website mentioned above.
 5. Now you're good to go! Run the project with " python liquidity_engine.py " and watch the magic happen.
 

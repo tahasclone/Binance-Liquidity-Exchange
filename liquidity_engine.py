@@ -35,6 +35,7 @@ def on_message(ws, message):
         # place new orders
         place_order(TRADING_PAIR.upper(), ASK_ORDER_PRICE, "SELL")
         place_order(TRADING_PAIR.upper(), BID_ORDER_PRICE, "BUY")
+        
     else:
         print("Compare price has not crossed ask order price")
         

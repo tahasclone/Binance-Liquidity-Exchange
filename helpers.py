@@ -4,6 +4,8 @@ import time
 import hmac
 from urllib.parse import urlencode
 import hashlib
+import logging
+import json
 
 API_KEY = config.API_KEY
 API_SECRET = config.API_SECRET
@@ -27,7 +29,7 @@ def place_order(symbol, price, side):
         "type": "LIMIT_MAKER", #STOP_LOSS & STOP_LOSS_LIMIT orders not allowed for chosen trading pair
         "side": side,
         "price": price,
-        "quantity": 0.001,
+        "quantity": 1,
         "timestamp": round(time.time() * 1000)
     }
     
@@ -36,12 +38,20 @@ def place_order(symbol, price, side):
     
     try:
         response = requests.post(url = URL, headers=HEADERS, data = DATA)
+        response.raise_for_status()
+        
+        if response.status_code == 200:
+            print("** ", side, " Order placed at ", str(price), " **")
+            
+            return response.json()
     
-    except requests.exceptions as e:
-        print(e.response.text)
+    except requests.exceptions.HTTPError as e:
+        logging.warning(e.response.text)
+        return response.json()
     
-    if response.status_code == 200:
-        print("** ", side, " Order placed at ", str(price), " **")
+    except requests.exceptions.ConnectionError as e:
+        logging.error(e.response.text)
+        raise e
 
 def cancel_all_orders(symbol):
     URL = API_URL + "openOrders"
@@ -55,8 +65,17 @@ def cancel_all_orders(symbol):
     
     try:
         response = requests.delete(url = URL, headers=HEADERS, data = DATA)
-    except requests.exceptions as e:
-        print(e.response.text)
+        response.raise_for_status()
         
-    if response.status_code == 200:
-        print("** Existing orders cancelled **")
+        if response.status_code == 200:
+            print("** Existing orders cancelled **")
+            
+            return response.json()
+
+    except requests.exceptions.HTTPError as e:
+        logging.warning(e.response.text)
+        return response.json()
+    
+    except requests.exceptions.ConnectionError as e:
+        logging.error(e.response.text)
+        raise e
