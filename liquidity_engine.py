@@ -27,7 +27,7 @@ def on_message(ws, message):
     if COMPARE_PRICE > CURRENT_PRICE+100.0 or COMPARE_PRICE < CURRENT_PRICE-100.0:
         logging.debug("Compare price broke bid or ask limits")
         # Cancel existing orders
-        cancel_response = cancel_all_orders(TRADING_PAIR.upper())
+        cancel_all_orders(TRADING_PAIR.upper())
         
         # update values of current, bid and ask price
         CURRENT_PRICE = COMPARE_PRICE
@@ -35,8 +35,8 @@ def on_message(ws, message):
         BID_ORDER_PRICE = CURRENT_PRICE - 100.0
         
         # place new orders
-        ask_order_response = place_order(TRADING_PAIR.upper(), ASK_ORDER_PRICE, "SELL")
-        bid_order_response = place_order(TRADING_PAIR.upper(), BID_ORDER_PRICE, "BUY")
+        place_order(TRADING_PAIR.upper(), ASK_ORDER_PRICE, "SELL")
+        place_order(TRADING_PAIR.upper(), BID_ORDER_PRICE, "BUY")
 
     else:
         print("Compare price has not crossed ask order price")
@@ -47,4 +47,3 @@ try:
     ws.run_forever()
 except KeyboardInterrupt:
     cancel_all_orders(TRADING_PAIR.upper())
-    ws.close()

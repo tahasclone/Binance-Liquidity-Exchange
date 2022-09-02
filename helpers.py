@@ -6,6 +6,7 @@ logging.basicConfig(level=logging.DEBUG)
 API_KEY = config.API_KEY
 API_SECRET = config.API_SECRET
 
+# testnet url
 API_URL = "https://testnet.binance.vision/api/v3/"
 
 HEADERS = {
@@ -13,10 +14,12 @@ HEADERS = {
         "X-MBX-APIKEY": API_KEY
     }
 
+# signature required with data of trade api calls, signature is created with hmac256 of API Secret & querystring of params
 def create_signature(data):
     signature = hmac.new(bytes(API_SECRET, 'UTF-8') , urlencode(data).encode(), hashlib.sha256).hexdigest()
     return signature
 
+# function to place orders, data required is symbol, type of order, side ( buy or sell), quantity, timestamp in ms
 def place_order(symbol, price, side):
     URL = API_URL + "order"
 
@@ -46,9 +49,10 @@ def place_order(symbol, price, side):
         return response.json()
     
     except requests.exceptions.ConnectionError as e:
-        logging.error(e.response.text)
+        logging.error(e)
         raise e
 
+# function to cancel all existing orders placed by current account
 def cancel_all_orders(symbol):
     URL = API_URL + "openOrders"
     DATA = {
@@ -73,5 +77,5 @@ def cancel_all_orders(symbol):
         return response.json()
     
     except requests.exceptions.ConnectionError as e:
-        logging.error(e.response.text)
+        logging.error(e)
         raise e
