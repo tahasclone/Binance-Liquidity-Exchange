@@ -5,7 +5,6 @@ import hmac
 from urllib.parse import urlencode
 import hashlib
 import logging
-import json
 
 API_KEY = config.API_KEY
 API_SECRET = config.API_SECRET
@@ -29,7 +28,7 @@ def place_order(symbol, price, side):
         "type": "LIMIT_MAKER", #STOP_LOSS & STOP_LOSS_LIMIT orders not allowed for chosen trading pair
         "side": side,
         "price": price,
-        "quantity": 1,
+        "quantity": 0.001,
         "timestamp": round(time.time() * 1000)
     }
     
@@ -41,7 +40,7 @@ def place_order(symbol, price, side):
         response.raise_for_status()
         
         if response.status_code == 200:
-            print("** ", side, " Order placed at ", str(price), " **")
+            logging.debug(side, " Order placed at ", str(price))
             
             return response.json()
     
@@ -68,7 +67,7 @@ def cancel_all_orders(symbol):
         response.raise_for_status()
         
         if response.status_code == 200:
-            print("** Existing orders cancelled **")
+            logging.debug("Existing orders cancelled")
             
             return response.json()
 

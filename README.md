@@ -1,7 +1,5 @@
 # LIQUIDITY EXCHANGE ASSIGNMENT
 
-# What is it?
-
 ## Description
 The objective of the assignment is to provide liquidity to an Exchange. This is done by placing open orders and adjusting the price when the market is moving.
 

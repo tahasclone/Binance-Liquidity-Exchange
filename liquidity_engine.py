@@ -1,4 +1,4 @@
-import websocket, json
+import websocket, json, logging
 from helpers import place_order, cancel_all_orders
 
 TRADING_PAIR = "btcusdt"
@@ -11,10 +11,10 @@ SOCKET = f'wss://stream.binance.com:9443/ws/'+TRADING_PAIR+'@kline_'+TIME_INTERV
 
 
 def on_open(ws):
-    print("***Opened Connection***")
+    logging.debug("Opened Connection")
     
 def on_close(ws):
-    print("***Closed Connection***")
+    logging.debug("Closed Connection")
     
 def on_message(ws, message):
     global CURRENT_PRICE, ASK_ORDER_PRICE, BID_ORDER_PRICE
@@ -23,7 +23,7 @@ def on_message(ws, message):
 
     # Compare new price with ask & bid order price
     if COMPARE_PRICE > CURRENT_PRICE+100.0 or COMPARE_PRICE < CURRENT_PRICE - 100.0:
-        print("** compare price broke bid or ask limits **")
+        logging.debug("Compare price broke bid or ask limits")
         # Cancel existing orders
         cancel_all_orders(TRADING_PAIR.upper())
         
@@ -46,4 +46,3 @@ try:
 except KeyboardInterrupt:
     cancel_all_orders(TRADING_PAIR.upper())
     ws.close()
-    print("Connection Ended")
