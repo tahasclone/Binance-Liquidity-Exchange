@@ -1,4 +1,4 @@
-import config, requests, time, hmac, hashlib, logging
+import config, requests, time, hmac, hashlib, logging, json
 from urllib.parse import urlencode
 
 logging.basicConfig(level=logging.DEBUG)
@@ -28,7 +28,7 @@ def place_order(symbol, price, side):
         "type": "LIMIT_MAKER", #STOP_LOSS & STOP_LOSS_LIMIT orders not allowed for chosen trading pair
         "side": side,
         "price": price,
-        "quantity": 0.001,
+        "quantity": 1,
         "timestamp": round(time.time() * 1000)
     }
     
@@ -42,15 +42,16 @@ def place_order(symbol, price, side):
         if response.status_code == 200:
             logging.debug(str(side) + " Order placed at " + str(price))
             
-            return response.json()
+            return True
     
     except requests.exceptions.HTTPError as e:
         logging.warning(e.response.text)
-        return response.json()
+        return False
     
     except requests.exceptions.ConnectionError as e:
         logging.error(e)
-        raise e
+        return False
+        
 
 # function to cancel all existing orders placed by current account
 def cancel_all_orders(symbol):
@@ -70,12 +71,12 @@ def cancel_all_orders(symbol):
         if response.status_code == 200:
             logging.debug("Existing orders cancelled")
             
-            return response.json()
+            return True
 
     except requests.exceptions.HTTPError as e:
         logging.warning(e.response.text)
-        return response.json()
+        return False
     
     except requests.exceptions.ConnectionError as e:
         logging.error(e)
-        raise e
+        return False
