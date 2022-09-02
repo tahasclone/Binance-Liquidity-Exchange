@@ -28,7 +28,7 @@ def place_order(symbol, price, side):
         "type": "LIMIT_MAKER", #STOP_LOSS & STOP_LOSS_LIMIT orders not allowed for chosen trading pair
         "side": side,
         "price": price,
-        "quantity": 1,
+        "quantity": 0.001,
         "timestamp": round(time.time() * 1000)
     }
     
