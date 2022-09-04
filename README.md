@@ -22,3 +22,7 @@ We do this by:
 4. Create a file called " config.py " and include the API_KEY and API_SECRET generated from the testnet website mentioned above.
 5. Now you're good to go! Run the project with " python liquidity_engine.py " and watch the magic happen.
 
+## Improvements for scaling
+- Using asyncio 
+- Placing multiple orders 
+- Using multiple accounts 

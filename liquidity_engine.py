@@ -1,3 +1,5 @@
+from curses.ascii import CAN
+from tkinter.messagebox import CANCEL
 import websocket, json, logging
 from helpers import place_order, cancel_all_orders
 
@@ -8,6 +10,7 @@ TIME_INTERVAL = "1m"
 CURRENT_PRICE = 0.0
 ASK_ORDER_PRICE = 0.0
 BID_ORDER_PRICE = 0.0
+CANCEL_COUNT=0
 
 SOCKET = f'wss://stream.binance.com:9443/ws/'+TRADING_PAIR+'@kline_'+TIME_INTERVAL
 
@@ -15,21 +18,25 @@ SOCKET = f'wss://stream.binance.com:9443/ws/'+TRADING_PAIR+'@kline_'+TIME_INTERV
 def on_open(ws):
     logging.debug("Opened Connection")
     
-def on_close(ws):
+def on_close(ws,  close_status_code, close_msg):
     logging.debug("Closed Connection")
     
 def on_message(ws, message):
-    global CURRENT_PRICE, ASK_ORDER_PRICE, BID_ORDER_PRICE
+    global CURRENT_PRICE, ASK_ORDER_PRICE, BID_ORDER_PRICE, CANCEL_COUNT
+
     price_data = json.loads(message)
     COMPARE_PRICE = float(price_data['k']['c'])
-
+    
     # Compare new price with ask & bid order price
     if COMPARE_PRICE > CURRENT_PRICE+100.0 or COMPARE_PRICE < CURRENT_PRICE-100.0:
         logging.debug("Compare price broke bid or ask limits")
         # Cancel existing orders
-        cancel_order_response = cancel_all_orders(TRADING_PAIR.upper())
-        if not cancel_all_orders:
-            exit()
+        if CANCEL_COUNT > 0:
+            cancel_order_response = cancel_all_orders(TRADING_PAIR.upper())
+            if not cancel_order_response:
+                exit()
+        else:
+            CANCEL_COUNT+=1
         
         # update values of current, bid and ask price
         CURRENT_PRICE = COMPARE_PRICE
@@ -46,11 +53,8 @@ def on_message(ws, message):
             exit()
 
     else:
-        print("Compare price has not crossed ask order price")
-        
+        logging.debug("Compare price has not crossed ask or bid order price")    
 
-try:
+if __name__ == '__main__':
     ws = websocket.WebSocketApp(SOCKET, on_open=on_open, on_close=on_close, on_message=on_message)
     ws.run_forever()
-except KeyboardInterrupt:
-    cancel_all_orders(TRADING_PAIR.upper())

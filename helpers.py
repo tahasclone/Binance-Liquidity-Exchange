@@ -1,13 +1,11 @@
-import config, requests, time, hmac, hashlib, logging, json
+import config, requests, time, hmac, hashlib, logging
 from urllib.parse import urlencode
 
 logging.basicConfig(level=logging.DEBUG)
 
 API_KEY = config.API_KEY
 API_SECRET = config.API_SECRET
-
-# testnet url
-API_URL = "https://testnet.binance.vision/api/v3/"
+API_URL = config.API_URL
 
 HEADERS = {
         "Content-Type": "application/json",
@@ -45,7 +43,7 @@ def place_order(symbol, price, side):
             return True
     
     except requests.exceptions.HTTPError as e:
-        logging.warning(e.response.text)
+        logging.error(e.response.text)
         return False
     
     except requests.exceptions.ConnectionError as e:
@@ -74,7 +72,7 @@ def cancel_all_orders(symbol):
             return True
 
     except requests.exceptions.HTTPError as e:
-        logging.warning(e.response.text)
+        logging.error(e.response.text)
         return False
     
     except requests.exceptions.ConnectionError as e:
