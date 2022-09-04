@@ -10,7 +10,7 @@ TIME_INTERVAL = "1m"
 CURRENT_PRICE = 0.0
 ASK_ORDER_PRICE = 0.0
 BID_ORDER_PRICE = 0.0
-CANCEL_COUNT=0
+CANCEL_COUNT=0 # This is being set to not cancel the first comparison of price
 
 SOCKET = f'wss://stream.binance.com:9443/ws/'+TRADING_PAIR+'@kline_'+TIME_INTERVAL
 
@@ -40,7 +40,7 @@ def on_message(ws, message):
         
         # update values of current, bid and ask price
         CURRENT_PRICE = COMPARE_PRICE
-        ASK_ORDER_PRICE = CURRENT_PRICE + 100.0
+        ASK_ORDER_PRICE = CURRENT_PRICE + 100.0 # change value to 20.0 for easier testing purpose
         BID_ORDER_PRICE = CURRENT_PRICE - 100.0
         
         # place new orders
