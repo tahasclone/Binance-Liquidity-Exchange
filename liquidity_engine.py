@@ -1,5 +1,3 @@
-from curses.ascii import CAN
-from tkinter.messagebox import CANCEL
 import websocket, json, logging
 from helpers import place_order, cancel_all_orders
 
